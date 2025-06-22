@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { Calendar } from "@/components/ui/calendar"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -8,12 +8,12 @@ import { ChevronLeft, ChevronRight, MapPin, Clock, Route } from "lucide-react"
 import { format, isSameDay } from "date-fns"
 
 // Marathon events happening in India - Extended through 2025
-const sampleEvents = [
+const createSampleEvents = () => [
   // December 2024
   {
     id: 1,
     title: "Goa River Marathon",
-    date: new Date(2024, 11, 8), // December 8, 2024
+    date: "2024-12-08",
     time: "6:30 AM",
     category: "marathon",
     color: "bg-teal-500",
@@ -23,7 +23,7 @@ const sampleEvents = [
   {
     id: 2,
     title: "Bengaluru Marathon",
-    date: new Date(2024, 11, 15), // December 15, 2024
+    date: "2024-12-15",
     time: "5:00 AM",
     category: "marathon",
     color: "bg-green-500",
@@ -33,7 +33,7 @@ const sampleEvents = [
   {
     id: 3,
     title: "Delhi Half Marathon",
-    date: new Date(2024, 11, 29), // December 29, 2024
+    date: "2024-12-29",
     time: "6:00 AM",
     category: "marathon",
     color: "bg-blue-500",
@@ -45,7 +45,7 @@ const sampleEvents = [
   {
     id: 4,
     title: "Kochi Marathon",
-    date: new Date(2025, 0, 5), // January 5, 2025
+    date: "2025-01-05",
     time: "5:30 AM",
     category: "marathon",
     color: "bg-cyan-500",
@@ -55,7 +55,7 @@ const sampleEvents = [
   {
     id: 5,
     title: "Jaipur Marathon",
-    date: new Date(2025, 0, 12), // January 12, 2025
+    date: "2025-01-12",
     time: "6:00 AM",
     category: "marathon",
     color: "bg-yellow-500",
@@ -65,7 +65,7 @@ const sampleEvents = [
   {
     id: 6,
     title: "Mumbai Marathon",
-    date: new Date(2025, 0, 19), // January 19, 2025
+    date: "2025-01-19",
     time: "5:30 AM",
     category: "marathon",
     color: "bg-red-500",
@@ -75,7 +75,7 @@ const sampleEvents = [
   {
     id: 7,
     title: "Pune International Marathon",
-    date: new Date(2025, 0, 26), // January 26, 2025
+    date: "2025-01-26",
     time: "5:30 AM",
     category: "marathon",
     color: "bg-orange-500",
@@ -87,7 +87,7 @@ const sampleEvents = [
   {
     id: 8,
     title: "Kolkata Marathon",
-    date: new Date(2025, 1, 2), // February 2, 2025
+    date: "2025-02-02",
     time: "6:00 AM",
     category: "marathon",
     color: "bg-indigo-500",
@@ -97,7 +97,7 @@ const sampleEvents = [
   {
     id: 9,
     title: "Hyderabad Marathon",
-    date: new Date(2025, 1, 9), // February 9, 2025
+    date: "2025-02-09",
     time: "5:00 AM",
     category: "marathon",
     color: "bg-purple-500",
@@ -107,7 +107,7 @@ const sampleEvents = [
   {
     id: 10,
     title: "Chennai Marathon",
-    date: new Date(2025, 1, 16), // February 16, 2025
+    date: "2025-02-16",
     time: "5:30 AM",
     category: "marathon",
     color: "bg-pink-500",
@@ -117,7 +117,7 @@ const sampleEvents = [
   {
     id: 11,
     title: "Ahmedabad Marathon",
-    date: new Date(2025, 1, 23), // February 23, 2025
+    date: "2025-02-23",
     time: "6:00 AM",
     category: "marathon",
     color: "bg-emerald-500",
@@ -129,7 +129,7 @@ const sampleEvents = [
   {
     id: 12,
     title: "Lucknow Marathon",
-    date: new Date(2025, 2, 2), // March 2, 2025
+    date: "2025-03-02",
     time: "6:30 AM",
     category: "marathon",
     color: "bg-violet-500",
@@ -139,7 +139,7 @@ const sampleEvents = [
   {
     id: 13,
     title: "Bhopal Marathon",
-    date: new Date(2025, 2, 9), // March 9, 2025
+    date: "2025-03-09",
     time: "6:00 AM",
     category: "marathon",
     color: "bg-rose-500",
@@ -149,7 +149,7 @@ const sampleEvents = [
   {
     id: 14,
     title: "Chandigarh Marathon",
-    date: new Date(2025, 2, 16), // March 16, 2025
+    date: "2025-03-16",
     time: "6:30 AM",
     category: "marathon",
     color: "bg-amber-500",
@@ -159,7 +159,7 @@ const sampleEvents = [
   {
     id: 15,
     title: "Nagpur Marathon",
-    date: new Date(2025, 2, 23), // March 23, 2025
+    date: "2025-03-23",
     time: "6:00 AM",
     category: "marathon",
     color: "bg-lime-500",
@@ -171,7 +171,7 @@ const sampleEvents = [
   {
     id: 16,
     title: "Coimbatore Marathon",
-    date: new Date(2025, 3, 6), // April 6, 2025
+    date: "2025-04-06",
     time: "5:30 AM",
     category: "marathon",
     color: "bg-sky-500",
@@ -181,7 +181,7 @@ const sampleEvents = [
   {
     id: 17,
     title: "Surat Marathon",
-    date: new Date(2025, 3, 13), // April 13, 2025
+    date: "2025-04-13",
     time: "6:00 AM",
     category: "marathon",
     color: "bg-fuchsia-500",
@@ -191,7 +191,7 @@ const sampleEvents = [
   {
     id: 18,
     title: "Thiruvananthapuram Marathon",
-    date: new Date(2025, 3, 20), // April 20, 2025
+    date: "2025-04-20",
     time: "5:30 AM",
     category: "marathon",
     color: "bg-slate-500",
@@ -203,7 +203,7 @@ const sampleEvents = [
   {
     id: 19,
     title: "Shimla Hill Marathon",
-    date: new Date(2025, 4, 4), // May 4, 2025
+    date: "2025-05-04",
     time: "7:00 AM",
     category: "marathon",
     color: "bg-stone-500",
@@ -213,7 +213,7 @@ const sampleEvents = [
   {
     id: 20,
     title: "Dehradun Marathon",
-    date: new Date(2025, 4, 11), // May 11, 2025
+    date: "2025-05-11",
     time: "6:30 AM",
     category: "marathon",
     color: "bg-neutral-500",
@@ -223,7 +223,7 @@ const sampleEvents = [
   {
     id: 21,
     title: "Mysore Marathon",
-    date: new Date(2025, 4, 18), // May 18, 2025
+    date: "2025-05-18",
     time: "5:30 AM",
     category: "marathon",
     color: "bg-zinc-500",
@@ -235,7 +235,7 @@ const sampleEvents = [
   {
     id: 22,
     title: "Vadodara Marathon",
-    date: new Date(2025, 9, 5), // October 5, 2025
+    date: "2025-10-05",
     time: "6:00 AM",
     category: "marathon",
     color: "bg-red-600",
@@ -245,7 +245,7 @@ const sampleEvents = [
   {
     id: 23,
     title: "Indore Marathon",
-    date: new Date(2025, 9, 12), // October 12, 2025
+    date: "2025-10-12",
     time: "6:30 AM",
     category: "marathon",
     color: "bg-blue-600",
@@ -255,7 +255,7 @@ const sampleEvents = [
   {
     id: 24,
     title: "Visakhapatnam Marathon",
-    date: new Date(2025, 9, 19), // October 19, 2025
+    date: "2025-10-19",
     time: "5:30 AM",
     category: "marathon",
     color: "bg-green-600",
@@ -265,7 +265,7 @@ const sampleEvents = [
   {
     id: 25,
     title: "Patna Marathon",
-    date: new Date(2025, 9, 26), // October 26, 2025
+    date: "2025-10-26",
     time: "6:00 AM",
     category: "marathon",
     color: "bg-purple-600",
@@ -277,7 +277,7 @@ const sampleEvents = [
   {
     id: 26,
     title: "Guwahati Marathon",
-    date: new Date(2025, 10, 2), // November 2, 2025
+    date: "2025-11-02",
     time: "6:30 AM",
     category: "marathon",
     color: "bg-pink-600",
@@ -287,7 +287,7 @@ const sampleEvents = [
   {
     id: 27,
     title: "Bhubaneswar Marathon",
-    date: new Date(2025, 10, 9), // November 9, 2025
+    date: "2025-11-09",
     time: "6:00 AM",
     category: "marathon",
     color: "bg-orange-600",
@@ -297,7 +297,7 @@ const sampleEvents = [
   {
     id: 28,
     title: "Ranchi Marathon",
-    date: new Date(2025, 10, 16), // November 16, 2025
+    date: "2025-11-16",
     time: "6:30 AM",
     category: "marathon",
     color: "bg-teal-600",
@@ -307,7 +307,7 @@ const sampleEvents = [
   {
     id: 29,
     title: "Raipur Marathon",
-    date: new Date(2025, 10, 23), // November 23, 2025
+    date: "2025-11-23",
     time: "6:00 AM",
     category: "marathon",
     color: "bg-cyan-600",
@@ -317,7 +317,7 @@ const sampleEvents = [
   {
     id: 30,
     title: "Jammu Marathon",
-    date: new Date(2025, 10, 30), // November 30, 2025
+    date: "2025-11-30",
     time: "7:00 AM",
     category: "marathon",
     color: "bg-yellow-600",
@@ -329,7 +329,7 @@ const sampleEvents = [
   {
     id: 31,
     title: "Agra Marathon",
-    date: new Date(2025, 11, 7), // December 7, 2025
+    date: "2025-12-07",
     time: "6:30 AM",
     category: "marathon",
     color: "bg-indigo-600",
@@ -339,7 +339,7 @@ const sampleEvents = [
   {
     id: 32,
     title: "Jodhpur Marathon",
-    date: new Date(2025, 11, 14), // December 14, 2025
+    date: "2025-12-14",
     time: "6:00 AM",
     category: "marathon",
     color: "bg-violet-600",
@@ -349,7 +349,7 @@ const sampleEvents = [
   {
     id: 33,
     title: "Mangalore Marathon",
-    date: new Date(2025, 11, 21), // December 21, 2025
+    date: "2025-12-21",
     time: "5:30 AM",
     category: "marathon",
     color: "bg-rose-600",
@@ -372,11 +372,19 @@ const monthThemes = {
   9: "from-cyan-400 via-cyan-500 to-cyan-600", // October
   10: "from-blue-500 via-indigo-500 to-purple-600", // November
   11: "from-purple-500 via-violet-500 to-indigo-600", // December
-}
+} as const
 
 export default function EventCalendar() {
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date()) // Use today's date
-  const [currentMonth, setCurrentMonth] = useState<Date>(new Date()) // Use current month
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date())
+  const [currentMonth, setCurrentMonth] = useState<Date>(new Date())
+
+  // Memoize the events with proper Date objects
+  const sampleEvents = useMemo(() => {
+    return createSampleEvents().map((event) => ({
+      ...event,
+      date: new Date(event.date),
+    }))
+  }, [])
 
   const getEventsForDate = (date: Date) => {
     return sampleEvents.filter((event) => isSameDay(event.date, date))
@@ -384,13 +392,13 @@ export default function EventCalendar() {
 
   const getUpcomingEvents = () => {
     const today = new Date()
-    today.setHours(0, 0, 0, 0) // Reset time to start of day for accurate comparison
+    today.setHours(0, 0, 0, 0)
 
     return sampleEvents
       .filter((event) => {
         const eventDate = new Date(event.date)
-        eventDate.setHours(0, 0, 0, 0) // Reset time to start of day
-        return eventDate >= today // Include today and future events
+        eventDate.setHours(0, 0, 0, 0)
+        return eventDate >= today
       })
       .sort((a, b) => a.date.getTime() - b.date.getTime())
       .slice(0, 5)
@@ -544,7 +552,7 @@ export default function EventCalendar() {
                 </div>
 
                 <div className="space-y-1">
-                  {upcomingEvents.map((event, index) => (
+                  {upcomingEvents.map((event) => (
                     <div
                       key={event.id}
                       className="bg-white/15 backdrop-blur-sm rounded-lg p-1.5 sm:p-2 border border-white/20 hover:bg-white/20 transition-all duration-200 cursor-pointer"
