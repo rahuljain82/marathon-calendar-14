@@ -1,11 +1,13 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Calendar } from "@/components/ui/calendar"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ChevronLeft, ChevronRight, MapPin, Clock, Route } from "lucide-react"
 import { format, isSameDay } from "date-fns"
+import dynamic from "next/dynamic"
+
+const CalendarNoSSR = dynamic(() => import("@/components/ui/calendar").then((m) => m.Calendar), { ssr: false })
 
 // Marathon events happening in India - Extended through 2025
 const createSampleEvents = () => [
@@ -476,17 +478,14 @@ export default function EventCalendar() {
 
                 {/* Calendar Grid */}
                 <div className="w-full max-w-md">
-                  <Calendar
+                  <CalendarNoSSR
                     mode="single"
                     selected={selectedDate}
-                    onSelect={(date) => {
-                      if (date) {
-                        setSelectedDate(date)
-                      }
-                    }}
+                    onSelect={(date) => date && setSelectedDate(date)}
                     month={currentMonth}
                     onMonthChange={setCurrentMonth}
                     className="rounded-lg sm:rounded-xl bg-white/10 backdrop-blur-sm border-0 p-2 sm:p-3 w-full"
+                    /* …keep the existing classNames & components props exactly the same… */
                     classNames={{
                       months: "text-white w-full",
                       month: "space-y-2 sm:space-y-3 w-full",
@@ -519,21 +518,21 @@ export default function EventCalendar() {
                                 setSelectedDate(date)
                               }}
                               className={`
-                              h-6 w-6 sm:h-8 sm:w-8 p-0 font-normal rounded-lg transition-all duration-200 cursor-pointer text-xs sm:text-sm
-                              ${
-                                isSelected
-                                  ? "bg-white text-gray-900 hover:bg-white/90 font-semibold shadow-lg scale-105"
-                                  : "text-white hover:bg-white/20 active:bg-white/30"
-                              }
-                              ${isToday && !isSelected ? "bg-white/20 text-white font-semibold" : ""}
-                              ${hasEvents && !isSelected ? "ring-1 ring-white/40" : ""}
-                            `}
+              h-6 w-6 sm:h-8 sm:w-8 p-0 font-normal rounded-lg transition-all duration-200 cursor-pointer text-xs sm:text-sm
+              ${
+                isSelected
+                  ? "bg-white text-gray-900 hover:bg-white/90 font-semibold shadow-lg scale-105"
+                  : "text-white hover:bg-white/20 active:bg-white/30"
+              }
+              ${isToday && !isSelected ? "bg-white/20 text-white font-semibold" : ""}
+              ${hasEvents && !isSelected ? "ring-1 ring-white/40" : ""}
+            `}
                             >
                               {format(date, "d")}
                             </button>
                             {hasEvents && (
                               <div className="absolute -bottom-0.5 left-1/2 transform -translate-x-1/2">
-                                <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-white rounded-full opacity-90"></div>
+                                <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-white rounded-full opacity-90" />
                               </div>
                             )}
                           </div>
